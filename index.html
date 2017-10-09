@@ -162,10 +162,10 @@ async function connect_usb()
 			if (adb != null) {
 				console.log("ADB mode");
 				this.state("connected");
-				this.execute_cmd("shell:ls -l /tmp/test_webadb.txt");
-				this.stat_filename("/tmp/test_webadb.txt");
-				this.pull_filename("/tmp/test_webadb.txt");
-				this.push_filename("/tmp/test_webadb.txt");
+				this.execute_cmd("shell:ls -l /sdcard/Download/test_webadb.txt");
+				this.stat_filename("/sdcard/Download/test_webadb.txt");
+				this.pull_filename("/sdcard/Download/test_webadb.txt");
+				this.push_filename("/sdcard/Download/test_webadb.txt");
 				this.push_content("Hello Web!");
 				this.push_mode("0644");
 			}
