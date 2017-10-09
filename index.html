@@ -37,22 +37,6 @@
          class="w3-container w3-block w3-sand w3-border w3-border-blue w3-left-align w3-round" style="display: none">
       <p>
         <div class="w3-container w3-cell w3-cell-middle">
-          <input type="submit" data-bind="click: execute_usb, enable: is_execute_enabled()" class="w3-button w3-green" value="Send" />
-        </div>
-        <div class="w3-container w3-cell w3-cell-middle" style="width: 100%">
-          <input type="text" data-bind="value: execute_cmd, enable: is_execute_enabled(), hasFocus: is_execute_enabled()" class="w3-input w3-border w3-round"/>
-        </div>
-      </p>
-      <p>
-        <div class="w3-container w3-cell w3-cell-middle">
-          <input type="button" data-bind="click: stat_usb, enable: is_execute_enabled() && adb" class="w3-button w3-green" value="Stat" />
-        </div>
-        <div class="w3-container w3-cell w3-cell-middle" style="width: 100%">
-          <input type="text" data-bind="value: stat_filename, enable: is_execute_enabled() && adb" class="w3-input w3-border w3-round"/>
-        </div>
-      </p>
-      <p>
-        <div class="w3-container w3-cell w3-cell-middle">
           <input type="button" data-bind="click: push_usb, enable: is_execute_enabled() && adb" class="w3-button w3-green" value="Push" />
         </div>
         <div class="w3-container w3-cell w3-cell-middle" style="width: 50%">
@@ -71,6 +55,22 @@
         </div>
         <div class="w3-container w3-cell w3-cell-middle" style="width: 100%">
           <input type="text" data-bind="value: pull_filename, enable: is_execute_enabled() && adb" class="w3-input w3-border w3-round"/>
+        </div>
+      </p>
+      <p>
+        <div class="w3-container w3-cell w3-cell-middle">
+          <input type="button" data-bind="click: stat_usb, enable: is_execute_enabled() && adb" class="w3-button w3-green" value="Stat" />
+        </div>
+        <div class="w3-container w3-cell w3-cell-middle" style="width: 100%">
+          <input type="text" data-bind="value: stat_filename, enable: is_execute_enabled() && adb" class="w3-input w3-border w3-round"/>
+        </div>
+      </p>
+      <p>
+        <div class="w3-container w3-cell w3-cell-middle">
+          <input type="submit" data-bind="click: execute_usb, enable: is_execute_enabled()" class="w3-button w3-green" value="Send" />
+        </div>
+        <div class="w3-container w3-cell w3-cell-middle" style="width: 100%">
+          <input type="text" data-bind="value: execute_cmd, enable: is_execute_enabled(), hasFocus: is_execute_enabled()" class="w3-input w3-border w3-round"/>
         </div>
       </p>
     </div>
