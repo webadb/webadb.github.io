@@ -112,26 +112,19 @@ function removeElementById(id)
 
 async function connect_usb()
 {
+	this.state("connecting");
+
 	try {
 		if (webusb == null)
 			webusb = await Adb.open("WebUSB");
 
 		if (!webusb || !(webusb.isAdb() || webusb.isFastboot()))
 			throw new Error("Could not open either ADB or Fastboot");
-
-		let message = "";
-
-		if (webusb.isAdb())
-			message = "ADB: ";
-		if (webusb.isFastboot())
-			message = "FASTBOOT: ";
-
-		message += webusb.device.productName + " (" + webusb.device.manufacturerName + ")";
-		this.connect_message(message);
 	}
 	catch(error) {
 		console.log(error);
 		this.connect_message(error.message);
+		this.state("ready");
 		webusb = null;
 		return;
 	}
@@ -149,6 +142,7 @@ async function connect_usb()
 		catch(error) {
 			console.log(error);
 			this.connect_message(error.message);
+			this.state("ready");
 			fastboot = null;
 			webusb = null;
 			return;
@@ -158,7 +152,9 @@ async function connect_usb()
 	if (webusb.isAdb()) {
 		try {
 			adb = null;
-			adb = await webusb.connectAdb("host::");
+			adb = await webusb.connectAdb("host::", () =>
+				this.connect_message("Please check the screen of your " + webusb.device.productName + "."));
+
 			if (adb != null) {
 				console.log("ADB mode");
 				this.state("connected");
@@ -173,11 +169,22 @@ async function connect_usb()
 		catch(error) {
 			console.log(error);
 			this.connect_message(error.message);
+			this.state("ready");
 			adb = null;
 			webusb = null;
 			return;
 		}
 	}
+
+	let message = "";
+
+	if (webusb.isAdb())
+		message = "ADB: ";
+	if (webusb.isFastboot())
+		message = "FASTBOOT: ";
+
+	message += webusb.device.productName + " (" + webusb.device.manufacturerName + ")";
+	this.connect_message(message);
 }
 
 async function execute_usb()
