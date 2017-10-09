@@ -26,7 +26,7 @@
          class="w3-container w3-block w3-sand w3-border w3-border-blue w3-left-align w3-round" style="display: none">
       <p>
         <div class="w3-container w3-cell w3-cell-middle">
-          <input type="button" data-bind="click: connect_usb, enable: state() == 'available'" class="w3-button w3-green" value="Connect" />
+          <input type="button" data-bind="click: connect_usb, enable: state() == 'ready'" class="w3-button w3-green" value="Connect" />
         </div>
         <div class="w3-container w3-cell w3-cell-middle">
           <span data-bind="text: connect_message, visibile: connect_message() != ''"></span>
@@ -229,7 +229,7 @@ async function execute_usb()
 	catch(error) {
 		console.log(error);
 		this.connect_message(error.message);
-		this.state("available");
+		this.state("ready");
 		webusb = null;
 	}
 }
@@ -255,7 +255,7 @@ async function stat_usb()
 	catch(error) {
 		console.log(error);
 		this.connect_message(error.message);
-		this.state("available");
+		this.state("ready");
 		webusb = null;
 	}
 }
@@ -312,7 +312,7 @@ async function push_usb()
 }
 
 function WebADBViewModel() {
-	this.state = ko.observable("available");
+	this.state = ko.observable("ready");
 
 	this.connect_message = ko.observable();
 	this.execute_cmd = ko.observable();
