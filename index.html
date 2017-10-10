@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>WebADB | Android Debug Bridge (adb) host in your browser</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="WebUSB based Android Debug Bridge (adb) host" />
+    <meta name="keywords" content="adb, webusb, android adb" />
     <link rel="stylesheet" type="text/css" href="https://www.w3schools.com/w3css/3/w3.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
     <script src="webadb.js/webadb.js"></script>
@@ -17,9 +20,12 @@
     </div>
     <div id="disclaimer" data-bind="visible: true" class="w3-container w3-block w3-sand w3-border w3-border-orange w3-left-align w3-round" style="display: none">
       <p>
-        This page is supposed to access a device connected to your PC via USB.
+        This page uses the <a href="https://developer.android.com/studio/command-line/adb.html">ADB</a> protocol over
+        <a href="https://wicg.github.io/webusb">WebUSB</a> to access the Android device connected to your PC via USB.
         The whole elaboration is done locally and under your complete responsibility.<br>
-        <a href="https://labs.mwrinfosecurity.com/blog/webusb/">What can possibly go wrong?</a>
+      </p>
+      <p>
+        <a href="https://labs.mwrinfosecurity.com/blog/webusb/">What could possibly go wrong?</a>
       </p>
     </div>
     <div data-bind="visible: 'usb' in navigator"
