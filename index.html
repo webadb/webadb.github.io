@@ -43,16 +43,16 @@
          class="w3-container w3-block w3-sand w3-border w3-border-blue w3-left-align w3-round" style="display: none">
       <p>
         <div class="w3-container w3-cell w3-cell-middle">
-          <input type="button" data-bind="click: push_usb, enable: is_execute_enabled() && adb" class="w3-button w3-green" value="Push" />
+          <input type="button" data-bind="click: push_usb, enable: is_execute_enabled() && adb && push_content() != null" class="w3-button w3-green" value="Push" />
         </div>
         <div class="w3-container w3-cell w3-cell-middle" style="width: 50%">
-          <input type="text" data-bind="value: push_filename, enable: is_execute_enabled() && adb" class="w3-input w3-border w3-round"/>
+          <input type="file" data-bind="event: { change: on_file_select }, enable: is_execute_enabled() && adb" class="w3-input w3-border w3-round"/>
         </div>
-        <div class="w3-container w3-cell w3-cell-middle" style="width: 30%">
-          <input type="text" data-bind="value: push_content, enable: is_execute_enabled() && adb" class="w3-input w3-border w3-round"/>
-        </div>
-        <div class="w3-container w3-cell w3-cell-middle" style="width: 20%">
+        <!-- div class="w3-container w3-cell w3-cell-middle" style="width: 20%">
           <input type="text" data-bind="numeric, value: push_mode, enable: is_execute_enabled() && adb" class="w3-input w3-border w3-round"/>
+        </div -->
+        <div class="w3-container w3-cell w3-cell-middle" style="width: 50%">
+          <input type="text" data-bind="value: push_filename, enable: is_execute_enabled() && adb" class="w3-input w3-border w3-round"/>
         </div>
       </p>
       <p>
@@ -168,7 +168,6 @@ async function connect_usb()
 				this.stat_filename("/sdcard/Download/test_webadb.txt");
 				this.pull_filename("/sdcard/Download/test_webadb.txt");
 				this.push_filename("/sdcard/Download/test_webadb.txt");
-				this.push_content("Hello Web!");
 				this.push_mode("0644");
 			}
 		}
@@ -310,7 +309,7 @@ async function push_usb()
 
 			let sync = await adb.sync();
 			await sync.push_start(this.push_filename(), this.push_mode());
-			await sync.push_data(this.push_content());
+			await this.push_content().then(data => sync.push_data(data));
 			await sync.push_done();
 
 			await sync.quit();
@@ -351,6 +350,20 @@ function WebADBViewModel() {
 	this.is_cancel_enabled = function() {
 		return this.state() == "running";
 	};
+
+	this.on_file_select = function(vm, evt) {
+		if (evt.target.files.length < 1) {
+			this.push_content(null);
+			return;
+		}
+
+		this.push_content(new Promise(function(resolve, reject) {
+			let reader = new FileReader();
+			reader.onload = e => resolve(e.target.result);
+			reader.onerror = e => reject(e.target.error);
+			reader.readAsArrayBuffer(evt.target.files[0]);
+		}));
+	}
 
 	this.connect_usb = connect_usb;
 	this.execute_usb = execute_usb;
