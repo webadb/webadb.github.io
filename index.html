@@ -43,7 +43,7 @@
          class="w3-container w3-block w3-sand w3-border w3-border-blue w3-left-align w3-round" style="display: none">
       <p>
         <div class="w3-container w3-cell w3-cell-middle">
-          <input type="button" data-bind="click: push_usb, enable: is_execute_enabled() && adb && push_content() != null" class="w3-button w3-green" value="Push" />
+          <input type="button" data-bind="click: push_usb, enable: is_execute_enabled() && adb && push_files().length" class="w3-button w3-green" value="Push" />
         </div>
         <div class="w3-container w3-cell w3-cell-middle" style="width: 50%">
           <input type="file" data-bind="event: { change: on_file_select }, enable: is_execute_enabled() && adb" class="w3-input w3-border w3-round"/>
@@ -52,7 +52,7 @@
           <input type="text" data-bind="numeric, value: push_mode, enable: is_execute_enabled() && adb" class="w3-input w3-border w3-round"/>
         </div -->
         <div class="w3-container w3-cell w3-cell-middle" style="width: 50%">
-          <input type="text" data-bind="value: push_filename, enable: is_execute_enabled() && adb" class="w3-input w3-border w3-round"/>
+          <input type="text" data-bind="value: push_dest, enable: is_execute_enabled() && adb" class="w3-input w3-border w3-round"/>
         </div>
       </p>
       <p>
@@ -167,7 +167,7 @@ async function connect_usb()
 				this.execute_cmd("shell:ls -l /sdcard/Download/test_webadb.txt");
 				this.stat_filename("/sdcard/Download/test_webadb.txt");
 				this.pull_filename("/sdcard/Download/test_webadb.txt");
-				this.push_filename("/sdcard/Download/test_webadb.txt");
+				this.push_dest("/sdcard/Download/test_webadb.txt");
 				this.push_mode("0644");
 			}
 		}
@@ -308,12 +308,12 @@ async function push_usb()
 			this.state("running");
 
 			let sync = await adb.sync();
-			await sync.push_start(this.push_filename(), this.push_mode());
-			await this.push_content().then(data => sync.push_data(data));
-			await sync.push_done();
+			await sync.push(this.push_files()[0], this.push_dest(), this.push_mode(),
+				(done, total) => output(Math.round(100 * done / total) + "%"));
 
 			await sync.quit();
 			this.state("connected");
+			output("");
 		}
 	}
 	catch(error) {
@@ -331,9 +331,9 @@ function WebADBViewModel() {
 	this.execute_output = ko.observable();
 	this.stat_filename = ko.observable();
 	this.pull_filename = ko.observable();
-	this.push_filename = ko.observable();
+	this.push_dest = ko.observable();
 	this.push_mode = ko.observable();
-	this.push_content = ko.observable();
+	this.push_files = ko.observable([]);
 
 	this.is_execute_visible = function() {
 		return this.state() == "connected" || this.state() == "running";
@@ -352,17 +352,7 @@ function WebADBViewModel() {
 	};
 
 	this.on_file_select = function(vm, evt) {
-		if (evt.target.files.length < 1) {
-			this.push_content(null);
-			return;
-		}
-
-		this.push_content(new Promise(function(resolve, reject) {
-			let reader = new FileReader();
-			reader.onload = e => resolve(e.target.result);
-			reader.onerror = e => reject(e.target.error);
-			reader.readAsArrayBuffer(evt.target.files[0]);
-		}));
+		this.push_files(evt.target.files);
 	}
 
 	this.connect_usb = connect_usb;
