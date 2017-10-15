@@ -91,8 +91,7 @@
     </div>
     <span id="bottom"></span>
   </form>
-
-    <script>
+  <script>
 var params = location.search.substring(1).split("&");
 var webusb = null;
 var adb = null;
@@ -323,7 +322,8 @@ async function push_usb()
 	}
 }
 
-function WebADBViewModel() {
+function WebADBViewModel()
+{
 	this.state = ko.observable("ready");
 
 	this.connect_message = ko.observable();
@@ -366,7 +366,7 @@ function WebADBViewModel() {
 			shell.close();
 		this.state("connected");
 	};
-};
+}
 
 if ('usb' in navigator) {
 	removeElementById("nowebusb");
@@ -375,6 +375,6 @@ if ('usb' in navigator) {
 	let nowebusb = document.getElementById("nowebusb");
 	nowebusb.style.display = null;
 }
-    </script>
+  </script>
 </body>
 </html>
