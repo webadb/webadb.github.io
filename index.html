@@ -97,6 +97,7 @@ var webusb = null;
 var adb = null;
 var fastboot = null;
 var shell = null;
+var sync = null;
 
 for (p in params) {
 	var pair = params[p].split("=");
@@ -255,11 +256,12 @@ async function stat_usb()
 			this.state("running");
 			output("");
 
-			let sync = await adb.sync();
+			sync = await adb.sync();
 			let stat = await sync.stat(this.stat_filename());
 			output(JSON.stringify(stat));
 
 			await sync.quit();
+			sync = null;
 			this.state("connected");
 		}
 	}
@@ -281,12 +283,13 @@ async function pull_usb()
 			this.state("running");
 			output("");
 
-			let sync = await adb.sync();
+			sync = await adb.sync();
 			let content = await sync.pull(this.pull_filename());
 			let decoder = new TextDecoder();
 			output(decoder.decode(content));
 
 			await sync.quit();
+			sync = null;
 			this.state("connected");
 		}
 	}
@@ -305,12 +308,14 @@ async function push_usb()
 	try {
 		if (adb != null ) {
 			this.state("running");
+			output("Loading " + this.push_files()[0].name + "...");
 
-			let sync = await adb.sync();
+			sync = await adb.sync();
 			await sync.push(this.push_files()[0], this.push_dest(), this.push_mode(),
 				(done, total) => output(Math.round(100 * done / total) + "%"));
 
 			await sync.quit();
+			sync = null;
 			this.state("connected");
 			output("");
 		}
@@ -361,9 +366,11 @@ function WebADBViewModel()
 	this.pull_usb = pull_usb;
 	this.push_usb = push_usb;
 
-	this.cancel_usb = function() {
+	this.cancel_usb = async function() {
 		if (shell != null)
 			shell.close();
+		if (sync != null)
+			await sync.abort();
 		this.state("connected");
 	};
 }
