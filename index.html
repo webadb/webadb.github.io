@@ -32,7 +32,7 @@
          class="w3-container w3-block w3-sand w3-border w3-border-blue w3-left-align w3-round" style="display: none">
       <p>
         <div class="w3-container w3-cell w3-cell-middle">
-          <input type="button" data-bind="click: connect_usb, enable: state() == 'ready'" class="w3-button w3-green" value="Connect" />
+          <input type="button" data-bind="click: connect_usb, enable: is_connect_disconnect_enabled(), value: connect_disconnect_value()" class="w3-button w3-green" />
         </div>
         <div class="w3-container w3-cell w3-cell-middle">
           <span data-bind="text: connect_message, visibile: connect_message() != ''"></span>
@@ -116,13 +116,28 @@ function removeElementById(id)
 		node.parentNode.removeChild(node);
 }
 
+async function disconnect_usb()
+{
+	if (shell != null)
+		shell.close();
+	if (sync != null)
+		await sync.abort();
+	webusb.close();
+	webusb = null;
+}
+
 async function connect_usb()
 {
-	this.state("connecting");
-
 	try {
-		if (webusb == null)
+		if (webusb != null) {
+			this.state("disconnecting");
+			disconnect_usb();
+			this.state("ready");
+			return;
+		} else {
+			this.state("connecting");
 			webusb = await Adb.open("WebUSB");
+		}
 
 		if (!webusb || !(webusb.isAdb() || webusb.isFastboot()))
 			throw new Error("Could not open either ADB or Fastboot");
@@ -339,6 +354,14 @@ function WebADBViewModel()
 	this.push_dest = ko.observable();
 	this.push_mode = ko.observable();
 	this.push_files = ko.observable([]);
+
+	this.connect_disconnect_value = function() {
+		return this.state() == "ready" || this.state() == "connecting" ? "Connect" : "Disconnect";
+	};
+
+	this.is_connect_disconnect_enabled = function() {
+		return this.state() != "running" && this.state() != "connecting";
+	};
 
 	this.is_execute_visible = function() {
 		return this.state() == "connected" || this.state() == "running";
