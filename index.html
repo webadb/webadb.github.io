@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>WebADB | Android Debug Bridge (adb) host in your browser</title>
+    <title>WebADB | Android Debug Bridge WebApp</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="WebUSB based Android Debug Bridge (adb) host" />
-    <meta name="keywords" content="adb, webusb, android adb" />
+    <meta name="keywords" content="adb, webusb, android adb, adb host, adb webapp" />
+    <link rel="manifest" href="manifest-webadb.json" />
     <link rel="stylesheet" type="text/css" href="https://www.w3schools.com/w3css/3/w3.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
     <script src="webadb.js/webadb.js"></script>
@@ -20,7 +21,7 @@
     </div>
     <div id="disclaimer" data-bind="visible: true" class="w3-container w3-block w3-sand w3-border w3-border-orange w3-left-align w3-round" style="display: none">
       <p>
-        This page uses the <a href="https://developer.android.com/studio/command-line/adb.html">ADB</a> protocol over
+        This <span data-bind="text: is_webapp() ? 'application' : 'page'"></span> uses the <a href="https://developer.android.com/studio/command-line/adb.html">ADB</a> protocol over
         <a href="https://wicg.github.io/webusb">WebUSB</a> to access the Android device connected to your PC via USB.
         The whole elaboration is done locally and under your complete responsibility.<br>
       </p>
@@ -93,6 +94,7 @@
   </form>
   <script>
 var params = location.search.substring(1).split("&");
+var is_webapp = false;
 var webusb = null;
 var adb = null;
 var fastboot = null;
@@ -107,6 +109,8 @@ for (p in params) {
 		Adb.Opt.dump = true;
 	if (pair[0] == "reuse_key")
 		Adb.Opt.reuse_key = (pair[1] == "yes") ? true : (pair[1] == "no") ? false : parseInt(pair[1]);
+	if (pair[0] == "webapp")
+		is_webapp = (pair[1] == "yes");
 }
 
 function removeElementById(id)
@@ -345,6 +349,7 @@ async function push_usb()
 function WebADBViewModel()
 {
 	this.state = ko.observable("ready");
+	this.is_webapp = ko.observable(is_webapp);
 
 	this.connect_message = ko.observable();
 	this.execute_cmd = ko.observable();

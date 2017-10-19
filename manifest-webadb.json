@@ -1,0 +1,13 @@
+{
+  "name": "Android Debug Bridge WebApp",
+  "short_name": "WebADB",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "Android_robot_204px.png",
+      "type": "image/png",
+      "sizes": "204x240"
+    }
+  ],
+  "start_url": "index.html?webapp=yes"
+}
