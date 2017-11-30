@@ -319,6 +319,34 @@ async function pull_usb()
 	}
 }
 
+var xfer_stats_done = 0;
+var xfer_stats_time = 0;
+
+function xfer_stats(start_time, done, total, output)
+{
+	let now = Date.now();
+
+	if (now - xfer_stats_time < 500)
+		return;
+
+	if (xfer_stats_done > done)
+		xfer_stats_done = 0;
+	if (xfer_stats_time < start_time)
+		xfer_stats_time = start_time;
+
+	let delta = Math.round((now - start_time) / 1000);
+	let instant = Math.round(((done - xfer_stats_done) * 1000) / ((now - xfer_stats_time) * 1024));
+	let average = Math.round(done * 1000 / ((now - start_time) * 1024));
+
+	xfer_stats_done = done;
+	xfer_stats_time = now;
+
+	let out = "";
+	out += Math.round(100 * done / total) + "% (";
+	out += Math.round(done / 1024) + " KiB in ~" + delta + " secs at avg " + average + " KiB/s, cur " + instant + " KiB/s)";
+	output(out);
+}
+
 async function push_usb()
 {
 	let output = this.execute_output;
@@ -330,13 +358,13 @@ async function push_usb()
 			output("Loading " + this.push_files()[0].name + "...");
 
 			sync = await adb.sync();
+			let start_time = Date.now();
 			await sync.push(this.push_files()[0], this.push_dest(), this.push_mode(),
-				(done, total) => output(Math.round(100 * done / total) + "%"));
+				(done, total) => xfer_stats(start_time, done, total, output));
 
 			await sync.quit();
 			sync = null;
 			this.state("connected");
-			output("");
 		}
 	}
 	catch(error) {
