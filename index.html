@@ -304,12 +304,15 @@ async function pull_usb()
 
 			sync = await adb.sync();
 			let content = await sync.pull(this.pull_filename());
-			let decoder = new TextDecoder();
-			output(decoder.decode(content));
 
 			await sync.quit();
 			sync = null;
 			this.state("connected");
+
+			let a = document.createElement("a")
+			a.href = URL.createObjectURL(new Blob([content]));
+			a.download = this.pull_filename().split("/").pop();
+			a.click();
 		}
 	}
 	catch(error) {
