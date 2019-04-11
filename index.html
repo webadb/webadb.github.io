@@ -166,7 +166,7 @@ async function connect_usb()
 		}
 		catch(error) {
 			console.log(error);
-			this.connect_message(error.message);
+			this.connect_message(error.message + " Ensure that the USB port is not in use (i.e. adb server is running).");
 			this.state("ready");
 			fastboot = null;
 			webusb = null;
@@ -192,7 +192,7 @@ async function connect_usb()
 		}
 		catch(error) {
 			console.log(error);
-			this.connect_message(error.message);
+			this.connect_message(error.message + " Ensure that the USB port is not in use (i.e. adb server is running).");
 			this.state("ready");
 			adb = null;
 			webusb = null;
